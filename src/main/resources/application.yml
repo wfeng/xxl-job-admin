@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: xxl-job-admin
+  profiles:
+    active: dev
+
+##Druid config
+druid:
+    username: future
+    password: future123
