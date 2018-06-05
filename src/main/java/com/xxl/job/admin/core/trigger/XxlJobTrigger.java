@@ -124,6 +124,8 @@ public class XxlJobTrigger {
             XxlJobLog jobLog = new XxlJobLog();
             jobLog.setJobGroup(jobInfo.getJobGroup());
             jobLog.setJobId(jobInfo.getId());
+            jobLog.setTriggerCode(0);
+            jobLog.setHandleCode(0);
             XxlJobDynamicScheduler.xxlJobLogMapper.save(jobLog);
             logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
