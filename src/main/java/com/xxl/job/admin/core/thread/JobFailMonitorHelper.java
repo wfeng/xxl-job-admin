@@ -62,65 +62,61 @@ public class JobFailMonitorHelper {
     }
 
     public void start() {
-        monitorThread = new Thread(new Runnable() {
+        monitorThread = new Thread(() -> {
+            // monitor
+            while (!toStop) {
+                try {
+                    List<Integer> jobLogIdList = new ArrayList<Integer>();
+                    int drainToNum = JobFailMonitorHelper.instance.queue.drainTo(jobLogIdList);
 
-            @Override
-            public void run() {
-                // monitor
-                while (!toStop) {
-                    try {
-                        List<Integer> jobLogIdList = new ArrayList<Integer>();
-                        int drainToNum = JobFailMonitorHelper.instance.queue.drainTo(jobLogIdList);
-
-                        if (CollectionUtils.isNotEmpty(jobLogIdList)) {
-                            for (Integer jobLogId : jobLogIdList) {
-                                if (jobLogId == null || jobLogId == 0) {
-                                    continue;
-                                }
-                                XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogMapper.load(jobLogId);
-                                if (log == null) {
-                                    continue;
-                                }
-                                if (IJobHandler.SUCCESS.getCode() == log.getTriggerCode() && log.getHandleCode() == 0) {
-                                    JobFailMonitorHelper.monitor(jobLogId);
-                                    logger.info(">>>>>>>>>>> job monitor, job running, JobLogId:{}", jobLogId);
-                                } else if (IJobHandler.SUCCESS.getCode() == log.getHandleCode()) {
-                                    // job success, pass
-                                    logger.info(">>>>>>>>>>> job monitor, job success, JobLogId:{}", jobLogId);
-                                } else if (IJobHandler.FAIL.getCode() == log.getTriggerCode()
-                                        || IJobHandler.FAIL.getCode() == log.getHandleCode()
-                                        || IJobHandler.FAIL_RETRY.getCode() == log.getHandleCode()) {
-                                    // job fail,
-                                    failAlarm(log);
-                                    logger.info(">>>>>>>>>>> job monitor, job fail, JobLogId:{}", jobLogId);
-                                } else {
-                                    JobFailMonitorHelper.monitor(jobLogId);
-                                    logger.info(">>>>>>>>>>> job monitor, job status unknown, JobLogId:{}", jobLogId);
-                                }
+                    if (CollectionUtils.isNotEmpty(jobLogIdList)) {
+                        for (Integer jobLogId : jobLogIdList) {
+                            if (jobLogId == null || jobLogId == 0) {
+                                continue;
+                            }
+                            XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogMapper.load(jobLogId);
+                            if (log == null) {
+                                continue;
+                            }
+                            if (IJobHandler.SUCCESS.getCode() == log.getTriggerCode() && log.getHandleCode() == 0) {
+                                JobFailMonitorHelper.monitor(jobLogId);
+                                logger.info(">>>>>>>>>>> job monitor, job running, JobLogId:{}", jobLogId);
+                            } else if (IJobHandler.SUCCESS.getCode() == log.getHandleCode()) {
+                                // job success, pass
+                                logger.info(">>>>>>>>>>> job monitor, job success, JobLogId:{}", jobLogId);
+                            } else if (IJobHandler.FAIL.getCode() == log.getTriggerCode()
+                                    || IJobHandler.FAIL.getCode() == log.getHandleCode()
+                                    || IJobHandler.FAIL_RETRY.getCode() == log.getHandleCode()) {
+                                // job fail,
+                                failAlarm(log);
+                                logger.info(">>>>>>>>>>> job monitor, job fail, JobLogId:{}", jobLogId);
+                            } else {
+                                JobFailMonitorHelper.monitor(jobLogId);
+                                logger.info(">>>>>>>>>>> job monitor, job status unknown, JobLogId:{}", jobLogId);
                             }
                         }
-
-                        TimeUnit.SECONDS.sleep(10);
-                    } catch (Exception e) {
-                        logger.error("job monitor error:{}", e);
                     }
-                }
 
-                // monitor all clear
-                List<Integer> jobLogIdList = new ArrayList<Integer>();
-                int drainToNum = getInstance().queue.drainTo(jobLogIdList);
-                if (jobLogIdList != null && jobLogIdList.size() > 0) {
-                    for (Integer jobLogId : jobLogIdList) {
-                        XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogMapper.load(jobLogId);
-                        if (ReturnT.FAIL_CODE == log.getTriggerCode() || ReturnT.FAIL_CODE == log.getHandleCode()) {
-                            // job fail,
-                            failAlarm(log);
-                            logger.info(">>>>>>>>>>> job monitor last, job fail, JobLogId:{}", jobLogId);
-                        }
-                    }
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (Exception e) {
+                    logger.error("job monitor error:{}", e);
                 }
-
             }
+
+            // monitor all clear
+            List<Integer> jobLogIdList = new ArrayList<Integer>();
+            int drainToNum = getInstance().queue.drainTo(jobLogIdList);
+            if (jobLogIdList != null && jobLogIdList.size() > 0) {
+                for (Integer jobLogId : jobLogIdList) {
+                    XxlJobLog log = XxlJobDynamicScheduler.xxlJobLogMapper.load(jobLogId);
+                    if (ReturnT.FAIL_CODE == log.getTriggerCode() || ReturnT.FAIL_CODE == log.getHandleCode()) {
+                        // job fail,
+                        failAlarm(log);
+                        logger.info(">>>>>>>>>>> job monitor last, job fail, JobLogId:{}", jobLogId);
+                    }
+                }
+            }
+
         });
         monitorThread.setDaemon(true);
         monitorThread.start();
