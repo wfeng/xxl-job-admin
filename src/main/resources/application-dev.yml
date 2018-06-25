@@ -59,3 +59,37 @@ mybatis:
 quartz:
     configLocation: quartz.properties
 
+
+#xxl-job配置
+xxl:
+    job:
+        ### xxl-job email
+        mail:
+            host: smtp.163.com
+            port: 25
+            username: xx@xx
+            password: 123456
+            sendNick: '《任务调度平台XXL-JOB》'
+        ### xxl-job login
+        login:
+            username: admin
+            password: 654321
+        ### xxl-job, access token
+        accessToken: ''
+        ### xxl-job, i18n (default empty as chinese, "en" as english)
+        i18n: ''
+    #执行器基础定义
+    jobInfo:
+        jobGroup: 2  #执行器主键ID	XXL_JOB_QRTZ_TRIGGER_GROUP.id
+        executorRouteStrategy: ROUND  #路由策略
+        glueType: BEAN  #运行模式 Bean模式
+        executorHandler: sparkJobHandler #执行JobHandler方法
+        executorBlockStrategy: SERIAL_EXECUTION #阻塞处理策略 单机串行
+
+###################################
+# 日志配置
+###################################
+logging:
+    level:
+        root: info
+        xxl.job.admin: debug

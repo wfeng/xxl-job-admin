@@ -3,7 +3,6 @@ package com.xxl.job.admin.core.conf;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * xxl-job config
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.PropertySource;
  * @author xuxueli 2017-04-28
  */
 @Configuration
-@PropertySource("classpath:xxl-job-admin.properties")
+//@PropertySource("classpath:xxl-job-admin.properties")
 public class XxlJobAdminConfig implements InitializingBean {
     private static XxlJobAdminConfig adminConfig = null;
     @Value("${xxl.job.mail.host}")
@@ -30,6 +29,21 @@ public class XxlJobAdminConfig implements InitializingBean {
     private String loginPassword;
     @Value("${xxl.job.i18n}")
     private String i18n;
+
+    @Value("${xxl.jobInfo.jobGroup}")
+    private int jobGroup;
+
+    @Value("${xxl.jobInfo.executorRouteStrategy}")
+    private String executorRouteStrategy;
+
+    @Value("${xxl.jobInfo.glueType}")
+    private String glueType;
+
+    @Value("${xxl.jobInfo.executorHandler}")
+    private String executorHandler;
+
+    @Value("${xxl.jobInfo.executorBlockStrategy}")
+    private String executorBlockStrategy;
 
     public static XxlJobAdminConfig getAdminConfig() {
         return adminConfig;
@@ -72,4 +86,23 @@ public class XxlJobAdminConfig implements InitializingBean {
         return i18n;
     }
 
+    public int getJobGroup() {
+        return jobGroup;
+    }
+
+    public String getExecutorRouteStrategy() {
+        return executorRouteStrategy;
+    }
+
+    public String getGlueType() {
+        return glueType;
+    }
+
+    public String getExecutorHandler() {
+        return executorHandler;
+    }
+
+    public String getExecutorBlockStrategy() {
+        return executorBlockStrategy;
+    }
 }

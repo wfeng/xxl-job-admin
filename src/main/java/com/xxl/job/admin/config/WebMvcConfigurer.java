@@ -77,9 +77,11 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new CookieInterceptor())
                 .excludePathPatterns("/static/**")
+                .excludePathPatterns("/api/**")
                 .addPathPatterns("/**");
         registry.addInterceptor(new PermissionInterceptor())
                 .excludePathPatterns("/static/**")
+                .excludePathPatterns("/api/**")
                 .addPathPatterns("/**");
         super.addInterceptors(registry);
     }

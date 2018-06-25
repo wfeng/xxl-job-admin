@@ -2,6 +2,7 @@ package com.xxl.job.admin.service;
 
 
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.core.model.XxlJobInfoExt;
 import com.xxl.job.core.biz.model.ReturnT;
 
 import java.util.Date;
@@ -34,6 +35,8 @@ public interface XxlJobService {
      * @return
      */
     public ReturnT<String> add(XxlJobInfo jobInfo);
+
+    public ReturnT<String> addExt(XxlJobInfoExt jobInfoExt);
 
     /**
      * update job

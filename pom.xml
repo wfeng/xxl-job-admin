@@ -38,6 +38,8 @@
         <pagehelper.version>4.1.1</pagehelper.version>
         <mapper.version>3.4.0</mapper.version>
         <druid.version>1.0.29</druid.version>
+
+        <fastjson.version>1.2.3</fastjson.version>
     </properties>
 
     <dependencies>
@@ -143,6 +145,20 @@
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper</artifactId>
             <version>${mapper.version}</version>
+        </dependency>
+
+        <!-- 对象拷贝工具 -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>0.7.5</version>
+        </dependency>
+
+        <!-- fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
         <!-- swagger依赖 -->

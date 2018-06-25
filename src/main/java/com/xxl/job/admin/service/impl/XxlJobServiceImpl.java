@@ -3,14 +3,12 @@ package com.xxl.job.admin.service.impl;
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.core.model.XxlJobInfoExt;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.admin.core.util.LocalCacheUtil;
-import com.xxl.job.admin.mapper.XxlJobGroupMapper;
-import com.xxl.job.admin.mapper.XxlJobInfoMapper;
-import com.xxl.job.admin.mapper.XxlJobLogGlueMapper;
-import com.xxl.job.admin.mapper.XxlJobLogMapper;
+import com.xxl.job.admin.mapper.*;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
@@ -46,6 +44,8 @@ public class XxlJobServiceImpl implements XxlJobService {
     private XxlJobInfoMapper xxlJobInfoMapper;
     @Resource
     private XxlJobLogGlueMapper xxlJobLogGlueMapper;
+    @Resource
+    private XxlJobInfoExtMapper xxlJobInfoExtMapper;
 
     @Override
     public Map<String, Object> pageList(int start, int length, int jobGroup, String jobDesc, String executorHandler, String filterTime) {
@@ -147,6 +147,26 @@ public class XxlJobServiceImpl implements XxlJobService {
             }
             return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_field_add") + I18nUtil.getString("system_fail")) + ":" + e.getMessage());
         }
+    }
+
+    @Override
+    public ReturnT<String> addExt(XxlJobInfoExt jobInfoExt) {
+        //获取任务读写
+        XxlJobInfo jobInfo = xxlJobInfoMapper.loadById(jobInfoExt.getJobId());
+        //判断任务是否存在
+        if (jobInfo == null) {
+            return new ReturnT<String>(ReturnT.FAIL_CODE,
+                    MessageFormat.format((I18nUtil.getString("jobinfo_field_id") + "({0})" + I18nUtil.getString("system_not_found")), jobInfoExt.getJobId()));
+        }
+        //判断模型是否存在
+        if (StringUtils.isEmpty(jobInfoExt.getCalculateModel())) {
+            return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_calculate_model") + I18nUtil.getString("system_unvalid")));
+        }
+        xxlJobInfoExtMapper.save(jobInfoExt);
+        if (jobInfo.getId() < 1) {
+            return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_field_add_ext") + I18nUtil.getString("system_fail")));
+        }
+        return ReturnT.SUCCESS;
     }
 
     @Override
