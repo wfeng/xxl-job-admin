@@ -32,16 +32,22 @@ public class XxlJobAdminConfig implements InitializingBean {
 
     @Value("${xxl.jobInfo.jobGroup}")
     private int jobGroup;
-
+    @Value("${xxl.jobInfo.jobCronEveryDay}")
+    private String jobCronEveryDay;
+    @Value("${xxl.jobInfo.jobCronManual}")
+    private String jobCronManual;
+    @Value("${xxl.jobInfo.executorFailStrategy}")
+    private String executorFailStrategy;
+    @Value("${xxl.jobInfo.author}")
+    private String author;
+    @Value("${xxl.jobInfo.alarmEmail}")
+    private String alarmEmail;
     @Value("${xxl.jobInfo.executorRouteStrategy}")
     private String executorRouteStrategy;
-
     @Value("${xxl.jobInfo.glueType}")
     private String glueType;
-
     @Value("${xxl.jobInfo.executorHandler}")
     private String executorHandler;
-
     @Value("${xxl.jobInfo.executorBlockStrategy}")
     private String executorBlockStrategy;
 
@@ -104,5 +110,25 @@ public class XxlJobAdminConfig implements InitializingBean {
 
     public String getExecutorBlockStrategy() {
         return executorBlockStrategy;
+    }
+
+    public String getJobCronEveryDay() {
+        return jobCronEveryDay;
+    }
+
+    public String getJobCronManual() {
+        return jobCronManual;
+    }
+
+    public String getExecutorFailStrategy() {
+        return executorFailStrategy;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getAlarmEmail() {
+        return alarmEmail;
     }
 }

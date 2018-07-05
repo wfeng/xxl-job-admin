@@ -13,13 +13,13 @@ public class CalculateModel {
     private String modelType;
 
     //源数据表列表
-    private List<TableAttribute> sourceTableList;
+    private List<SourceTableAttribute> sourceTableList;
 
     //执行语句
     private String executeSql;
 
     //目标表
-    private TableAttribute targetTable;
+    private DimensionTableAttribute targetTable;
 
     public String getModelType() {
         return modelType;
@@ -29,11 +29,11 @@ public class CalculateModel {
         this.modelType = modelType;
     }
 
-    public List<TableAttribute> getSourceTableList() {
+    public List<SourceTableAttribute> getSourceTableList() {
         return sourceTableList;
     }
 
-    public void setSourceTableList(List<TableAttribute> sourceTableList) {
+    public void setSourceTableList(List<SourceTableAttribute> sourceTableList) {
         this.sourceTableList = sourceTableList;
     }
 
@@ -45,11 +45,11 @@ public class CalculateModel {
         this.executeSql = executeSql;
     }
 
-    public TableAttribute getTargetTable() {
+    public DimensionTableAttribute getTargetTable() {
         return targetTable;
     }
 
-    public void setTargetTable(TableAttribute targetTable) {
+    public void setTargetTable(DimensionTableAttribute targetTable) {
         this.targetTable = targetTable;
     }
 }

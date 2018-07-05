@@ -184,19 +184,106 @@ CREATE TABLE `XXL_JOB_QRTZ_TRIGGER_INFO` (
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8
+  COMMENT '任务信息';
 
-CREATE TABLE `XXL_JOB_QRTZ_TRIGGER_INFO_EXT` (
-  `id`              INT(11) NOT NULL AUTO_INCREMENT,
-  `job_id`          INT(11) NOT NULL
-  COMMENT 'JOB主键ID',
-  `calculate_model` VARCHAR(10240)   DEFAULT NULL
-  COMMENT '计算模型json大对象',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY (`job_id`)
+CREATE TABLE `CUBE_INFO` (
+  `cube_id`       INT(11) NOT NULL
+  COMMENT '立方编号',
+  `cube_name`     VARCHAR(50) DEFAULT NULL
+  COMMENT '立方名称',
+  `trigger_model` VARCHAR(50) DEFAULT 'EVERY_DAY'
+  COMMENT '触发模式 EVERY_DAY - 每天 , MANUAL - 手动',
+  PRIMARY KEY (`cube_id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8
+  COMMENT '数据立方信息';
+
+CREATE TABLE `CUBE_SOURCE_TABLE` (
+  ##基础信息
+  `id`                     INT(11)      NOT NULL AUTO_INCREMENT,
+  `cube_id`                INT(11)      NOT NULL
+  COMMENT '立方编号',
+  `primary_table`          TINYINT(2)   NOT NULL
+  COMMENT '是否为主表 0-不是 1-是',
+  `table_name`             VARCHAR(255) NOT NULL
+  COMMENT '表名',
+  ##并行度设置
+  `parallelism`            INT(11)               DEFAULT 0
+  COMMENT '并行度',
+  `parallelism_field_name` VARCHAR(255) COMMENT '并行分区字段名',
+  `parallelism_type`       INT(11) COMMENT '并行分区类型 1-时间类型 2-数字类型',
+  ##jdbc设置
+  `jdbc_url`               VARCHAR(255) NOT NULL
+  COMMENT '数据库连接',
+  `jdbc_username`          VARCHAR(255) NOT NULL
+  COMMENT '访问账号',
+  `jdbc_password`          VARCHAR(255) NOT NULL
+  COMMENT '访问密码',
+  `jdbc_driver`            VARCHAR(255) NOT NULL
+  COMMENT 'jdbc驱动',
+  `jdbc_fetchsize`         INT(11)      NOT NULL
+  COMMENT '批量读取数量',
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COMMENT '数据立方源表信息';
+
+CREATE TABLE `CUBE_DIMENSION_INFO` (
+  ##基础信息
+  `id`             INT(11)       NOT NULL AUTO_INCREMENT,
+  `cube_id`        INT(11)       NOT NULL
+  COMMENT '立方编号',
+  `table_name`     VARCHAR(255)  NOT NULL
+  COMMENT '表名',
+  `description`    VARCHAR(255) COMMENT '维度描述',
+  `execute_sql`    VARCHAR(5000) NOT NULL
+  COMMENT '执行语句',
+  `save_mode`      INT(11)       NOT NULL
+  COMMENT '保存模式 1-Append/2-Overwrite/3-ErrorIfExists/4-Ignore',
+  `job_id`         INT(11)       NOT NULL
+  COMMENT '任务Id',
+  ##jdbc设置
+  `jdbc_url`       VARCHAR(255)  NOT NULL
+  COMMENT '数据库连接',
+  `jdbc_username`  VARCHAR(255)  NOT NULL
+  COMMENT '访问账号',
+  `jdbc_password`  VARCHAR(255)  NOT NULL
+  COMMENT '访问密码',
+  `jdbc_driver`    VARCHAR(255)  NOT NULL
+  COMMENT 'jdbc驱动',
+  `jdbc_batchsize` INT(11)       NOT NULL
+  COMMENT '批量执行数量',
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COMMENT '数据立方维度信息';
+
+CREATE TABLE `CUBE_DIMENSION_EXEC_LOG` (
+  `id`                  INT(11)   NOT NULL AUTO_INCREMENT,
+  `cube_id`             INT(11)   NOT NULL
+  COMMENT '立方编号',
+  `dim_id`              INT(11)   NOT NULL
+  COMMENT '维度编号',
+  `job_id`              INT(11)   NOT NULL
+  COMMENT '任务ID',
+  `statistical_time`    TIMESTAMP NULL     DEFAULT NULL
+  COMMENT '执行统计时间',
+  `business_start_time` TIMESTAMP NULL     DEFAULT NULL
+  COMMENT '业务开始时间',
+  `business_end_time`   TIMESTAMP NULL     DEFAULT NULL
+  COMMENT '业务结束时间',
+  `job_log_id`          INT(11)   NOT NULL
+  COMMENT '任务执行编号',
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COMMENT '数据立方维度执行日志';
+
 
 CREATE TABLE `XXL_JOB_QRTZ_TRIGGER_LOG` (
   `id`               INT(11)      NOT NULL AUTO_INCREMENT,

@@ -22,10 +22,10 @@ public class JdbcAttribute {
     private String driver;
 
     //批量读取数量
-    private String fetchsize;
+    private int fetchsize;
 
     //批量写入数量
-    private String batchsize;
+    private int batchsize;
 
     //默认构造
     public JdbcAttribute() {
@@ -40,7 +40,7 @@ public class JdbcAttribute {
     }
 
     //Jdbc属性源表指定批量读取数量构造
-    public JdbcAttribute(String url, String username, String password, String driver, String fetchsize) {
+    public JdbcAttribute(String url, String username, String password, String driver, int fetchsize) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -49,7 +49,7 @@ public class JdbcAttribute {
     }
 
     //Jdbc属性指定批量读取/批量写入数量构造
-    public JdbcAttribute(String url, String username, String password, String driver, String fetchsize, String batchsize) {
+    public JdbcAttribute(String url, String username, String password, String driver, int fetchsize, int batchsize) {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -90,19 +90,19 @@ public class JdbcAttribute {
         this.driver = driver;
     }
 
-    public String getFetchsize() {
+    public int getFetchsize() {
         return fetchsize;
     }
 
-    public void setFetchsize(String fetchsize) {
+    public void setFetchsize(int fetchsize) {
         this.fetchsize = fetchsize;
     }
 
-    public String getBatchsize() {
+    public int getBatchsize() {
         return batchsize;
     }
 
-    public void setBatchsize(String batchsize) {
+    public void setBatchsize(int batchsize) {
         this.batchsize = batchsize;
     }
 

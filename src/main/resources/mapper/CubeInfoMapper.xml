@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.job.admin.mapper.CubeInfoMapper">
+
+    <resultMap id="CubeInfo" type="com.xxl.job.admin.core.model.CubeInfo">
+        <result column="cube_id" property="cubeId"/>
+        <result column="cube_name" property="cubeName"/>
+        <result column="trigger_model" property="triggerModel"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        t.cube_id,
+        t.cube_name,
+        t.trigger_model
+    </sql>
+
+    <insert id="save" parameterType="com.xxl.job.admin.core.model.CubeInfo">
+        INSERT INTO CUBE_INFO (
+            cube_id,
+            cube_name,
+            trigger_model
+        ) VALUES (
+            #{cubeId},
+            #{cubeName},
+            #{triggerModel}
+        )
+    </insert>
+
+    <select id="loadByCubeId" parameterType="java.util.HashMap" resultMap="CubeInfo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM CUBE_INFO AS t
+        WHERE t.cube_id = #{cubeId}
+    </select>
+
+    <update id="update" parameterType="com.xxl.job.admin.core.model.CubeInfo">
+        UPDATE CUBE_INFO
+        SET
+            cube_id       = #{cubeId},
+            cube_name     = #{cubeName},
+            trigger_model = #{triggerModel}
+        WHERE cube_id = #{cubeId}
+    </update>
+
+    <delete id="delete" parameterType="java.util.HashMap">
+        DELETE
+        FROM CUBE_INFO
+        WHERE cube_id = #{cubeId}
+    </delete>
+
+</mapper>
