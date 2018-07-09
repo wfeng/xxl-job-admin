@@ -1,9 +1,7 @@
 package com.xxl.job.admin.core.trigger;
 
 import com.xxl.job.admin.core.enums.ExecutorFailStrategyEnum;
-import com.xxl.job.admin.core.model.XxlJobGroup;
-import com.xxl.job.admin.core.model.XxlJobInfo;
-import com.xxl.job.admin.core.model.XxlJobLog;
+import com.xxl.job.admin.core.model.*;
 import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import com.xxl.job.admin.core.thread.JobFailMonitorHelper;
@@ -40,6 +38,11 @@ public class XxlJobTrigger {
             logger.warn(">>>>>>>>>>>> trigger fail, jobId invalid，jobId={}", jobId);
             return;
         }
+        CubeDimensionInfo dimension = XxlJobDynamicScheduler.cubeDimensionInfoMapper.loadByJobId(jobId);
+        if (dimension == null) {
+            logger.warn(">>>>>>>>>>>> trigger fail, dimension table not exist, jobId invalid，jobId={}", jobId);
+            return;
+        }
         XxlJobGroup group = XxlJobDynamicScheduler.xxlJobGroupMapper.load(jobInfo.getJobGroup());  // group info
 
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
@@ -48,6 +51,7 @@ public class XxlJobTrigger {
         ArrayList<String> addressList = (ArrayList<String>) group.getRegistryList();
 
         // broadcast
+        //广播模式目前不支持 spark job executor
         if (ExecutorRouteStrategyEnum.SHARDING_BROADCAST == executorRouteStrategyEnum && CollectionUtils.isNotEmpty(addressList)) {
             for (int i = 0; i < addressList.size(); i++) {
                 String address = addressList.get(i);
@@ -146,6 +150,20 @@ public class XxlJobTrigger {
             triggerMsgSb.append("<br>").append(I18nUtil.getString("jobinfo_field_executorBlockStrategy")).append("：").append(blockStrategy.getTitle());
             triggerMsgSb.append("<br>").append(I18nUtil.getString("jobinfo_field_executorFailStrategy")).append("：").append(failStrategy.getTitle());
 
+
+            // 4.1、save cube dim exec log table
+//            CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
+//            dimExecLog.setCubeId(dimension.getCubeId());
+//            dimExecLog.setDimId(dimension.getId());
+//            dimExecLog.setJobId(jobId);
+//            dimExecLog.setJobLogId(jobLog.getId());
+//            XxlJobDynamicScheduler.cubeDimensionExecLogMapper.save(dimExecLog);
+//            logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}", dimExecLog.getId());
+            CubeDimensionExecLog execLog = XxlJobDynamicScheduler.cubeDimensionExecLogMapper.getLastOneLogByJobId(jobId);
+            execLog.setJobLogId(jobLog.getId());
+            XxlJobDynamicScheduler.cubeDimensionExecLogMapper.update(execLog);
+            logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}, jobLogId:{}", execLog.getId(), jobLog.getId());
+
             // 3、trigger-valid
             if (triggerResult.getCode() == ReturnT.SUCCESS_CODE && CollectionUtils.isEmpty(addressList)) {
                 triggerResult.setCode(ReturnT.FAIL_CODE);
@@ -153,7 +171,18 @@ public class XxlJobTrigger {
             }
 
             if (triggerResult.getCode() == ReturnT.SUCCESS_CODE) {
-                // 4.1、trigger-param
+
+//                // 4.1、save cube dim exec log table
+//                CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
+//                dimExecLog.setCubeId(dimension.getCubeId());
+//                dimExecLog.setDimId(dimension.getId());
+//                dimExecLog.setJobId(jobId);
+//                dimExecLog.setJobLogId(jobLog.getId());
+//                XxlJobDynamicScheduler.cubeDimensionExecLogMapper.save(dimExecLog);
+//                logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}", dimExecLog.getId());
+
+
+                // 4.2、trigger-param
                 TriggerParam triggerParam = new TriggerParam();
                 triggerParam.setJobId(jobInfo.getId());
                 triggerParam.setExecutorHandler(jobInfo.getExecutorHandler());
@@ -167,11 +196,11 @@ public class XxlJobTrigger {
                 triggerParam.setBroadcastIndex(0);
                 triggerParam.setBroadcastTotal(1);
 
-                // 4.2、trigger-run (route run / trigger remote executor)
+                // 4.3、trigger-run (route run / trigger remote executor)
                 triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                 triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
 
-                // 4.3、trigger (fail retry)
+                // 4.4、trigger (fail retry)
                 if (triggerResult.getCode() != ReturnT.SUCCESS_CODE && failStrategy == ExecutorFailStrategyEnum.FAIL_RETRY) {
                     triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                     triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());

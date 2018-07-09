@@ -23,8 +23,9 @@ public interface CubeDimensionInfoMapper {
 
     int delete(@Param("id") int id);
 
-    int deleteByCubeId(@Param("cubeId") int cubeId);
+    int deleteByCubeId(@Param("cubeId") String cubeId);
 
-    List<CubeDimensionInfo> getDimensionInfoByCubeId(@Param("cubeId") int cubeId);
+    List<CubeDimensionInfo> getDimensionInfoByCubeId(@Param("cubeId") String cubeId);
 
+    CubeDimensionInfo getDimensionInfoByDimTableName(@Param("cubeId") String cubeId, @Param("dimTableName") String dimTableName);
 }

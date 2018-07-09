@@ -9,6 +9,7 @@
         <result column="cube_id" property="cubeId"/>
         <result column="primary_table" property="primaryTable"/>
         <result column="table_name" property="tableName"/>
+        <result column="incr_field_name" property="incrFieldName"/>
         <result column="parallelism" property="parallelism"/>
         <result column="parallelism_field_name" property="parallelismFieldName"/>
         <result column="parallelism_type" property="parallelismType"/>
@@ -25,6 +26,7 @@
         t.cube_id,
         t.primary_table,
         t.table_name,
+        t.incr_field_name,
         t.parallelism,
         t.parallelism_field_name,
         t.parallelism_type,
@@ -41,6 +43,7 @@
             cube_id,
             primary_table,
             table_name,
+        incr_field_name,
             parallelism,
             parallelism_field_name,
             parallelism_type,
@@ -53,6 +56,7 @@
             #{cubeId},
             #{primaryTable},
             #{tableName},
+        #{incrFieldName},
             #{parallelism},
             #{parallelismFieldName},
             #{parallelismType},
@@ -77,6 +81,7 @@
             cube_id                = #{cubeId},
             primary_table          = #{primaryTable},
             table_name             = #{tableName},
+        incr_field_name = #{incrFieldName},
             parallelism            = #{parallelism},
             parallelism_field_name = #{parallelismFieldName},
             parallelism_type       = #{parallelismType},

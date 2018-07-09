@@ -4,10 +4,7 @@ import com.xxl.job.admin.core.jobbean.RemoteHttpJobBean;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.thread.JobFailMonitorHelper;
 import com.xxl.job.admin.core.thread.JobRegistryMonitorHelper;
-import com.xxl.job.admin.mapper.XxlJobGroupMapper;
-import com.xxl.job.admin.mapper.XxlJobInfoMapper;
-import com.xxl.job.admin.mapper.XxlJobLogMapper;
-import com.xxl.job.admin.mapper.XxlJobRegistryMapper;
+import com.xxl.job.admin.mapper.*;
 import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.ExecutorBiz;
 import com.xxl.job.core.rpc.netcom.NetComClientProxy;
@@ -40,7 +37,11 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
     public static XxlJobInfoMapper xxlJobInfoMapper;
     public static XxlJobRegistryMapper xxlJobRegistryMapper;
     public static XxlJobGroupMapper xxlJobGroupMapper;
+    //新增立方表操作mapper
+    public static CubeDimensionInfoMapper cubeDimensionInfoMapper;
+    public static CubeDimensionExecLogMapper cubeDimensionExecLogMapper;
     public static AdminBiz adminBiz;
+
     // scheduler
     private static Scheduler scheduler;
     // accessToken
@@ -318,6 +319,9 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         XxlJobDynamicScheduler.xxlJobInfoMapper = applicationContext.getBean(XxlJobInfoMapper.class);
         XxlJobDynamicScheduler.xxlJobRegistryMapper = applicationContext.getBean(XxlJobRegistryMapper.class);
         XxlJobDynamicScheduler.xxlJobGroupMapper = applicationContext.getBean(XxlJobGroupMapper.class);
+        //新增立方表操作mapper
+        XxlJobDynamicScheduler.cubeDimensionInfoMapper = applicationContext.getBean(CubeDimensionInfoMapper.class);
+        XxlJobDynamicScheduler.cubeDimensionExecLogMapper = applicationContext.getBean(CubeDimensionExecLogMapper.class);
         XxlJobDynamicScheduler.adminBiz = applicationContext.getBean(AdminBiz.class);
     }
 

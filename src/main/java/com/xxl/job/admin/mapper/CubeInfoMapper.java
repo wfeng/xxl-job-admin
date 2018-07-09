@@ -13,10 +13,10 @@ public interface CubeInfoMapper {
 
     int save(CubeInfo info);
 
-    CubeInfo loadByCubeId(@Param("cubeId") int cubeId);
+    CubeInfo loadByCubeId(@Param("cubeId") String cubeId);
 
     int update(CubeInfo item);
 
-    int delete(@Param("cubeId") int cubeId);
+    int delete(@Param("cubeId") String cubeId);
 
 }

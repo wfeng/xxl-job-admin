@@ -18,33 +18,14 @@ public class SourceTableAttribute {
     //表名
     private String tableName;
 
+    //增量字段
+    private String incrFieldName;
+
     //并行度分区属性
     private ParallelAttribute parallelAttribute;
 
     //默认构造
     public SourceTableAttribute() {
-    }
-
-    //源表主表简单构造
-    public SourceTableAttribute(JdbcAttribute jdbcAttr, String tableName, boolean primaryTable) {
-        this.jdbcAttr = jdbcAttr;
-        this.tableName = tableName;
-        this.primaryTable = primaryTable;
-    }
-
-    //源表简单构造
-    public SourceTableAttribute(JdbcAttribute jdbcAttr, String tableName) {
-        this.jdbcAttr = jdbcAttr;
-        this.tableName = tableName;
-        this.primaryTable = false;
-    }
-
-    //源表分区构造
-    public SourceTableAttribute(JdbcAttribute jdbcAttr, String tableName, boolean primaryTable, ParallelAttribute parallelAttribute) {
-        this.jdbcAttr = jdbcAttr;
-        this.tableName = tableName;
-        this.primaryTable = primaryTable;
-        this.parallelAttribute = parallelAttribute;
     }
 
     public boolean isPrimaryTable() {
@@ -71,6 +52,14 @@ public class SourceTableAttribute {
         this.tableName = tableName;
     }
 
+    public String getIncrFieldName() {
+        return incrFieldName;
+    }
+
+    public void setIncrFieldName(String incrFieldName) {
+        this.incrFieldName = incrFieldName;
+    }
+
     public ParallelAttribute getParallelAttribute() {
         return parallelAttribute;
     }
@@ -85,6 +74,7 @@ public class SourceTableAttribute {
                 "primaryTable=" + primaryTable +
                 ", jdbcAttr=" + jdbcAttr +
                 ", tableName='" + tableName + '\'' +
+                ", incrFieldName='" + incrFieldName + '\'' +
                 ", parallelAttribute=" + parallelAttribute +
                 '}';
     }

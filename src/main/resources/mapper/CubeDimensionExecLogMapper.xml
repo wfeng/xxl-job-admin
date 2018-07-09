@@ -40,7 +40,7 @@
             #{cubeId},
             #{dimId},
             #{jobId},
-            #{statisticalTime},
+        NOW(),
             #{businessStartTime},
             #{businessEndTime},
             #{jobLogId}
@@ -52,6 +52,13 @@
         <include refid="Base_Column_List"/>
         FROM CUBE_DIMENSION_EXEC_LOG AS t
         WHERE t.id = #{id}
+    </select>
+
+    <select id="loadByJobLogId" parameterType="java.util.HashMap" resultMap="CubeDimensionExecLog">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM CUBE_DIMENSION_EXEC_LOG AS t
+        WHERE t.job_log_id = #{jobLogId}
     </select>
 
     <update id="update" parameterType="com.xxl.job.admin.core.model.CubeDimensionExecLog">
@@ -78,5 +85,14 @@
         FROM CUBE_DIMENSION_EXEC_LOG
         WHERE cube_id = #{cubeId}
     </delete>
+
+    <select id="getLastOneLogByJobId" parameterType="java.util.HashMap" resultMap="CubeDimensionExecLog">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM CUBE_DIMENSION_EXEC_LOG AS t
+        WHERE t.job_id = #{jobId}
+        order by statistical_time desc
+        LIMIT 1
+    </select>
 
 </mapper>

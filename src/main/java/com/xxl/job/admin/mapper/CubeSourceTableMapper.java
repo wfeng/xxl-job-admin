@@ -17,12 +17,12 @@ public interface CubeSourceTableMapper {
 
     CubeSourceTable loadById(@Param("id") int id);
 
-    List<CubeSourceTable> getSourceTableByCubeId(@Param("cubeId") int cubeId);
+    List<CubeSourceTable> getSourceTableByCubeId(@Param("cubeId") String cubeId);
 
     int update(CubeSourceTable item);
 
     int delete(@Param("id") int id);
 
-    int deleteByCubeId(@Param("cubeId") int cubeId);
+    int deleteByCubeId(@Param("cubeId") String cubeId);
 
 }

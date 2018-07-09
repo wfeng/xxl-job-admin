@@ -9,7 +9,10 @@
         <result column="cube_id" property="cubeId"/>
         <result column="table_name" property="tableName"/>
         <result column="description" property="description"/>
-        <result column="execute_sql" property="executeSql"/>
+        <result column="select_sql" property="selectSql"/>
+        <result column="where_sql" property="whereSql"/>
+        <result column="groupby_sql" property="groupbySql"/>
+        <result column="having_sql" property="havingSql"/>
         <result column="save_mode" property="saveMode"/>
         <result column="job_id" property="jobId"/>
         <result column="jdbc_url" property="jdbcUrl"/>
@@ -25,7 +28,10 @@
         t.cube_id,
         t.table_name,
         t.description,
-        t.execute_sql,
+        t.select_sql,
+        t.where_sql,
+        t.groupby_sql,
+        t.having_sql,
         t.save_mode,
         t.job_id,
         t.jdbc_url,
@@ -41,7 +47,10 @@
             cube_id,
             table_name,
             description,
-            execute_sql,
+        select_sql,
+        where_sql,
+        groupby_sql,
+        having_sql,
             save_mode,
             job_id,
             jdbc_url,
@@ -53,7 +62,10 @@
             #{cubeId},
             #{tableName},
             #{description},
-            #{executeSql},
+        #{selectSql},
+        #{whereSql},
+        #{groupbySql},
+        #{havingSql},
             #{saveMode},
             #{jobId},
             #{jdbcUrl},
@@ -84,7 +96,10 @@
             cube_id        = #{cubeId},
             table_name     = #{tableName},
             description    = #{description},
-            execute_sql    = #{executeSql},
+        select_sql = #{selectSql},
+        where_sql = #{whereSql},
+        groupby_sql = #{groupbySql},
+        having_sql = #{havingSql},
             save_mode      = #{saveMode},
             job_id         = #{jobId},
             jdbc_url       = #{jdbcUrl},
@@ -112,6 +127,14 @@
         <include refid="Base_Column_List"/>
         FROM CUBE_DIMENSION_INFO AS t
         WHERE t.cube_id = #{cubeId}
+    </select>
+
+    <select id="getDimensionInfoByDimTableName" parameterType="java.util.HashMap" resultMap="CubeDimensionInfo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM CUBE_DIMENSION_INFO AS t
+        WHERE t.cube_id = #{cubeId}
+        and t.table_name = #{dimTableName}
     </select>
 
 </mapper>

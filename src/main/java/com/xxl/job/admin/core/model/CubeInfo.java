@@ -6,15 +6,15 @@ package com.xxl.job.admin.core.model;
  */
 public class CubeInfo {
 
-    private int cubeId;                // 立方编号
+    private String cubeId;                // 立方编号
     private String cubeName;                // 立方名称
     private String triggerModel;        // 触发模式
 
-    public int getCubeId() {
+    public String getCubeId() {
         return cubeId;
     }
 
-    public void setCubeId(int cubeId) {
+    public void setCubeId(String cubeId) {
         this.cubeId = cubeId;
     }
 

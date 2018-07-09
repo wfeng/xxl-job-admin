@@ -188,7 +188,7 @@ CREATE TABLE `XXL_JOB_QRTZ_TRIGGER_INFO` (
   COMMENT '任务信息';
 
 CREATE TABLE `CUBE_INFO` (
-  `cube_id`       INT(11) NOT NULL
+  `cube_id`       VARCHAR(50) NOT NULL
   COMMENT '立方编号',
   `cube_name`     VARCHAR(50) DEFAULT NULL
   COMMENT '立方名称',
@@ -203,12 +203,13 @@ CREATE TABLE `CUBE_INFO` (
 CREATE TABLE `CUBE_SOURCE_TABLE` (
   ##基础信息
   `id`                     INT(11)      NOT NULL AUTO_INCREMENT,
-  `cube_id`                INT(11)      NOT NULL
+  `cube_id`                VARCHAR(50)  NOT NULL
   COMMENT '立方编号',
   `primary_table`          TINYINT(2)   NOT NULL
   COMMENT '是否为主表 0-不是 1-是',
   `table_name`             VARCHAR(255) NOT NULL
   COMMENT '表名',
+  `incr_field_name`        VARCHAR(255) COMMENT '增量字段名',
   ##并行度设置
   `parallelism`            INT(11)               DEFAULT 0
   COMMENT '并行度',
@@ -234,13 +235,19 @@ CREATE TABLE `CUBE_SOURCE_TABLE` (
 CREATE TABLE `CUBE_DIMENSION_INFO` (
   ##基础信息
   `id`             INT(11)       NOT NULL AUTO_INCREMENT,
-  `cube_id`        INT(11)       NOT NULL
+  `cube_id`        VARCHAR(50)   NOT NULL
   COMMENT '立方编号',
   `table_name`     VARCHAR(255)  NOT NULL
   COMMENT '表名',
   `description`    VARCHAR(255) COMMENT '维度描述',
-  `execute_sql`    VARCHAR(5000) NOT NULL
-  COMMENT '执行语句',
+  `select_sql`     VARCHAR(5000) NOT NULL
+  COMMENT 'select语句',
+  `where_sql`      VARCHAR(5000) NOT NULL
+  COMMENT 'where语句',
+  `groupby_sql`    VARCHAR(5000) NOT NULL
+  COMMENT 'groupby语句',
+  `having_sql`     VARCHAR(5000) NULL
+  COMMENT 'having语句',
   `save_mode`      INT(11)       NOT NULL
   COMMENT '保存模式 1-Append/2-Overwrite/3-ErrorIfExists/4-Ignore',
   `job_id`         INT(11)       NOT NULL
@@ -263,20 +270,20 @@ CREATE TABLE `CUBE_DIMENSION_INFO` (
   COMMENT '数据立方维度信息';
 
 CREATE TABLE `CUBE_DIMENSION_EXEC_LOG` (
-  `id`                  INT(11)   NOT NULL AUTO_INCREMENT,
-  `cube_id`             INT(11)   NOT NULL
+  `id`                  INT(11)     NOT NULL AUTO_INCREMENT,
+  `cube_id`             VARCHAR(50) NOT NULL
   COMMENT '立方编号',
-  `dim_id`              INT(11)   NOT NULL
+  `dim_id`              INT(11)     NOT NULL
   COMMENT '维度编号',
-  `job_id`              INT(11)   NOT NULL
+  `job_id`              INT(11)     NOT NULL
   COMMENT '任务ID',
-  `statistical_time`    TIMESTAMP NULL     DEFAULT NULL
+  `statistical_time`    DATETIME    NOT NULL DEFAULT now()
   COMMENT '执行统计时间',
-  `business_start_time` TIMESTAMP NULL     DEFAULT NULL
+  `business_start_time` DATETIME    NULL     DEFAULT NULL
   COMMENT '业务开始时间',
-  `business_end_time`   TIMESTAMP NULL     DEFAULT NULL
+  `business_end_time`   DATETIME    NULL     DEFAULT NULL
   COMMENT '业务结束时间',
-  `job_log_id`          INT(11)   NOT NULL
+  `job_log_id`          INT(11)     NOT NULL
   COMMENT '任务执行编号',
   PRIMARY KEY (`id`)
 )

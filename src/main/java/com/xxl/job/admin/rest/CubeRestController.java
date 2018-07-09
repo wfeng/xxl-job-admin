@@ -12,10 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -41,7 +38,7 @@ public class CubeRestController {
         logger.info("创建数据立方接口");
 
         //验证输入项
-        if (requestVM.getCudeId() == 0) {
+        if (StringUtils.isBlank(requestVM.getCudeId())) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "请设置cubeId");
         }
         if (StringUtils.isBlank(requestVM.getCubeName())) {
@@ -83,16 +80,14 @@ public class CubeRestController {
     @PostMapping("/buildCubeJobs")
     public ReturnT<String> buildCubeJobs(@RequestBody BuildCubeJobsRequestVM requestVM) {
         logger.info("构建数据立方接口");
-
-        return ReturnT.SUCCESS;
+        return cubeService.buildCube(requestVM);
     }
 
     @ApiOperation(value = "清空立方任务", notes = "")
-    @PostMapping("/clearCubeJobs")
-    public ReturnT<String> clearCubeJobs(@RequestBody BuildCubeJobsRequestVM requestVM) {
+    @PostMapping("/clearCubeJobs/{cubeId}")
+    public ReturnT<String> clearCubeJobs(@PathVariable String cubeId) {
         logger.info("清空数据立方接口");
-
-        return ReturnT.SUCCESS;
+        return cubeService.clearCube(cubeId);
     }
 
     @ApiOperation(value = "刷新立方任务", notes = "")
@@ -104,16 +99,11 @@ public class CubeRestController {
     }
 
     @ApiOperation(value = "销毁立方任务", notes = "")
-    @PostMapping("/destroyCubeJobs")
-    public ReturnT<String> destroyCubeJobs(@RequestBody BuildCubeJobsRequestVM requestVM) {
+    @GetMapping("/destroyCubeJobs/{cubeId}")
+    public ReturnT<String> destroyCubeJobs(@PathVariable String cubeId) {
         logger.info("销毁数据立方接口");
-
-        return ReturnT.SUCCESS;
+        logger.info("销毁数据立方编号:" + cubeId);
+        return cubeService.destroyCube(cubeId);
     }
 
-//    @ApiOperation(value = "执行任务接口", notes = "")
-//    @GetMapping("/trigger/{id}")
-//    public ReturnT<String> triggerJob(@PathVariable int id) {
-//        return xxlJobService.triggerJob(id);
-//    }
 }

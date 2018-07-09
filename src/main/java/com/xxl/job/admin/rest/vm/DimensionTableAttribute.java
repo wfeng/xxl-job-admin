@@ -18,8 +18,17 @@ public class DimensionTableAttribute {
     //保存模式 1-Append/2-Overwrite/3-ErrorIfExists/4-Ignore
     private Integer saveMode;
 
-    //执行语句
-    private String executeSql;
+    //执行语句select部分
+    private String selectSql;
+
+    //执行语句where部分
+    private String whereSql;
+
+    //执行语句groupBy部分
+    private String groupbySql;
+
+    //执行语句having部分
+    private String havingSql;
 
     //维度表描述
     private String description;
@@ -48,14 +57,6 @@ public class DimensionTableAttribute {
         this.saveMode = saveMode;
     }
 
-    public String getExecuteSql() {
-        return executeSql;
-    }
-
-    public void setExecuteSql(String executeSql) {
-        this.executeSql = executeSql;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -64,13 +65,48 @@ public class DimensionTableAttribute {
         this.description = description;
     }
 
+    public String getSelectSql() {
+        return selectSql;
+    }
+
+    public void setSelectSql(String selectSql) {
+        this.selectSql = selectSql;
+    }
+
+    public String getWhereSql() {
+        return whereSql;
+    }
+
+    public void setWhereSql(String whereSql) {
+        this.whereSql = whereSql;
+    }
+
+    public String getGroupbySql() {
+        return groupbySql;
+    }
+
+    public void setGroupbySql(String groupbySql) {
+        this.groupbySql = groupbySql;
+    }
+
+    public String getHavingSql() {
+        return havingSql;
+    }
+
+    public void setHavingSql(String havingSql) {
+        this.havingSql = havingSql;
+    }
+
     @Override
     public String toString() {
         return "DimensionTableAttribute{" +
                 "jdbcAttr=" + jdbcAttr +
                 ", tableName='" + tableName + '\'' +
                 ", saveMode=" + saveMode +
-                ", executeSql='" + executeSql + '\'' +
+                ", selectSql='" + selectSql + '\'' +
+                ", whereSql='" + whereSql + '\'' +
+                ", groupbySql='" + groupbySql + '\'' +
+                ", havingSql='" + havingSql + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
@@ -78,7 +114,9 @@ public class DimensionTableAttribute {
     public boolean isEmpty() {
         return jdbcAttr.isEmpty()
                 || StringUtils.isBlank(tableName)
-                || StringUtils.isBlank(executeSql)
+                || StringUtils.isBlank(selectSql)
+                || StringUtils.isBlank(whereSql)
+                || StringUtils.isBlank(groupbySql)
                 || StringUtils.isBlank(description);
     }
 }

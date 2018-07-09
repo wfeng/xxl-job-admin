@@ -13,7 +13,7 @@ public class CreatCubeJobsRequestVM {
     public final static String MANUAL = "MANUAL";
 
     //立方编号
-    private int cudeId;
+    private String cudeId;
 
     //立方名称
     private String cubeName;
@@ -27,11 +27,11 @@ public class CreatCubeJobsRequestVM {
     //维度表列表
     private List<DimensionTableAttribute> dimensionTableList;
 
-    public int getCudeId() {
+    public String getCudeId() {
         return cudeId;
     }
 
-    public void setCudeId(int cudeId) {
+    public void setCudeId(String cudeId) {
         this.cudeId = cudeId;
     }
 

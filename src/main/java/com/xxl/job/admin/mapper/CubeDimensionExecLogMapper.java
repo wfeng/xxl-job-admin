@@ -19,6 +19,9 @@ public interface CubeDimensionExecLogMapper {
 
     int delete(@Param("id") int id);
 
-    int deleteByCubeId(@Param("cubeId") int cubeId);
+    int deleteByCubeId(@Param("cubeId") String cubeId);
 
+    CubeDimensionExecLog loadByJobLogId(@Param("jobLogId") int jobLogId);
+
+    CubeDimensionExecLog getLastOneLogByJobId(@Param("jobId") int jobId);
 }

@@ -81,8 +81,8 @@ xxl:
     #执行器基础定义
     jobInfo:
         jobGroup: 2  #执行器主键ID	XXL_JOB_QRTZ_TRIGGER_GROUP.id
-        jobCronEveryDay: '1 0 0 2 * * ?' #每天凌晨2点执行
-        jobCronManual: '1 0 0 2 * * ? 2099' #手动执行
+        jobCronEveryDay: '0 0 2 * * ?' #每天凌晨2点执行
+        jobCronManual: '0 0 2 * * ? 2099' #手动执行
         executorFailStrategy: FAIL_ALARM # 失败处理策略(FAIL_ALARM(失败警告)/FAIL_RETRY(失败重试))
         author: 'system' # 责任人
         alarmEmail: '' # 报警邮件 多个邮箱,分割

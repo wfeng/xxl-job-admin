@@ -1,11 +1,9 @@
 package com.xxl.job.admin.service.impl;
 
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
-import com.xxl.job.admin.core.model.CubeDimensionInfo;
-import com.xxl.job.admin.core.model.CubeInfo;
-import com.xxl.job.admin.core.model.CubeSourceTable;
-import com.xxl.job.admin.core.model.XxlJobInfo;
+import com.xxl.job.admin.core.model.*;
 import com.xxl.job.admin.core.util.I18nUtil;
+import com.xxl.job.admin.core.util.JdbcTemplateHelper;
 import com.xxl.job.admin.mapper.CubeDimensionExecLogMapper;
 import com.xxl.job.admin.mapper.CubeDimensionInfoMapper;
 import com.xxl.job.admin.mapper.CubeInfoMapper;
@@ -14,13 +12,17 @@ import com.xxl.job.admin.rest.vm.*;
 import com.xxl.job.admin.service.CubeService;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.util.JacksonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * 数据立方相关服务实现类
@@ -30,19 +32,16 @@ import java.util.List;
 @Service
 public class CubeServiceImpl implements CubeService {
 
-    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(CubeServiceImpl.class);
+    @Resource
     CubeInfoMapper cubeInfoMapper;
-
-    @Autowired
+    @Resource
     CubeSourceTableMapper cubeSourceTableMapper;
-
-    @Autowired
+    @Resource
     CubeDimensionInfoMapper cubeDimensionInfoMapper;
-
-    @Autowired
+    @Resource
     CubeDimensionExecLogMapper cubeDimensionExecLogMapper;
-
-    @Autowired
+    @Resource
     XxlJobService xxlJobService;
 
     @Override
@@ -89,6 +88,10 @@ public class CubeServiceImpl implements CubeService {
             cubeSourceTable.setJdbcPassword(jdbcAttr.getPassword());
             cubeSourceTable.setJdbcDriver(jdbcAttr.getDriver());
             cubeSourceTable.setJdbcFetchsize(jdbcAttr.getFetchsize());
+            //增量字段
+            if (!StringUtils.isBlank(sourceTable.getIncrFieldName())) {
+                cubeSourceTable.setIncrFieldName(sourceTable.getIncrFieldName());
+            }
             //分区属性
             ParallelAttribute parallelAttr = sourceTable.getParallelAttribute();
             if (parallelAttr != null) {
@@ -139,8 +142,16 @@ public class CubeServiceImpl implements CubeService {
             //xxl-job 添加任务
             ReturnT<String> runResult = xxlJobService.add(jobInfo);
             if (ReturnT.SUCCESS_CODE == runResult.getCode()) {
+                //成功创建job列表
                 jobList.add(jobInfo.getId());
 
+                //更新job执行执行器参数
+                Map<String, String> param = new HashMap<>();
+                param.put("cubeId", request.getCudeId());
+                param.put("jobId", jobInfo.getId() + "");
+                param.put("dimTableName", dimension.getTableName());
+                jobInfo.setExecutorParam(JacksonUtil.writeValueAsString(param));
+                xxlJobService.update(jobInfo);
 
                 //根据返回的任务Id添加立方维度表数据
                 CubeDimensionInfo cubeDim = new CubeDimensionInfo();
@@ -148,7 +159,10 @@ public class CubeServiceImpl implements CubeService {
                 cubeDim.setJobId(jobInfo.getId());
                 cubeDim.setCubeId(request.getCudeId());
                 cubeDim.setDescription(dimension.getDescription());
-                cubeDim.setExecuteSql(dimension.getExecuteSql());
+                cubeDim.setSelectSql(dimension.getSelectSql());
+                cubeDim.setWhereSql(dimension.getWhereSql());
+                cubeDim.setGroupbySql(dimension.getGroupbySql());
+                cubeDim.setHavingSql(dimension.getHavingSql());
                 cubeDim.setTableName(dimension.getTableName());
                 cubeDim.setSaveMode(dimension.getSaveMode());
                 //jdbc属性
@@ -176,8 +190,118 @@ public class CubeServiceImpl implements CubeService {
             cubeDimensionInfoMapper.deleteByCubeId(request.getCudeId());
             cubeSourceTableMapper.deleteByCubeId(request.getCudeId());
             cubeInfoMapper.delete(request.getCudeId());
-            return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_job") + I18nUtil.getString("system_add_fail")));
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_job") + I18nUtil.getString("system_add_fail")));
         }
+
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> destroyCube(String cubeId) {
+        List<CubeDimensionInfo> dimJobs = cubeDimensionInfoMapper.getDimensionInfoByCubeId(cubeId);
+        //删除任务
+        dimJobs.forEach(dimJob -> {
+            ReturnT<String> result = xxlJobService.remove(dimJob.getJobId());
+            logger.info(">>>>>>>>>>> removeJob, cubeId:{}, result [{}]", dimJob.getCubeId(), result.getCode());
+        });
+        cubeDimensionExecLogMapper.deleteByCubeId(cubeId);
+        cubeDimensionInfoMapper.deleteByCubeId(cubeId);
+        cubeSourceTableMapper.deleteByCubeId(cubeId);
+        cubeInfoMapper.delete(cubeId);
+
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> buildCube(BuildCubeJobsRequestVM requestVM) {
+        //获取立方信息
+        CubeInfo cubeInfo = cubeInfoMapper.loadByCubeId(requestVM.getCubeId());
+        if (cubeInfo == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("cube_info") + I18nUtil.getString("system_not_found")));
+        }
+        //获取源数据表列表
+        List<CubeSourceTable> sourceTableList = cubeSourceTableMapper.getSourceTableByCubeId(requestVM.getCubeId());
+        if (sourceTableList.isEmpty()) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("cube_source_table") + I18nUtil.getString("system_not_found")));
+        }
+        //获取维度列表
+        List<CubeDimensionInfo> dimensionList = cubeDimensionInfoMapper.getDimensionInfoByCubeId(requestVM.getCubeId());
+        if (dimensionList.isEmpty()) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("Cube_dimension_info") + I18nUtil.getString("system_not_found")));
+        }
+
+        //判断是否有起止时间
+        LocalDate startTime;
+        LocalDate endTime;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+        if (StringUtils.isNotBlank(requestVM.getStartTime()) && StringUtils.isNotBlank(requestVM.getEndTime())) {
+            startTime = LocalDate.parse(requestVM.getStartTime(), df);
+            endTime = LocalDate.parse(requestVM.getEndTime(), df);
+        } else {
+            startTime = LocalDate.now();
+            endTime = LocalDate.now();
+        }
+
+        //执行构建指定维表
+        if (!StringUtils.isBlank(requestVM.getDimTableName())) {
+            CubeDimensionInfo dimTable = cubeDimensionInfoMapper.getDimensionInfoByDimTableName(requestVM.getCubeId(), requestVM.getDimTableName());
+            //创建维度执行日志
+            CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
+            dimExecLog.setCubeId(dimTable.getCubeId());
+            dimExecLog.setDimId(dimTable.getId());
+            dimExecLog.setJobId(dimTable.getJobId());
+            dimExecLog.setBusinessStartTime(startTime);
+            dimExecLog.setBusinessEndTime(endTime);
+            cubeDimensionExecLogMapper.save(dimExecLog);
+            ReturnT<String> result = xxlJobService.triggerJob(dimTable.getJobId());
+            if (result.getCode() == ReturnT.SUCCESS_CODE) {
+                logger.info("触发成功");
+            }
+        } else {
+            //执行立方下所有维度任务
+            List<CubeDimensionInfo> dimensionInfoList = cubeDimensionInfoMapper.getDimensionInfoByCubeId(requestVM.getCubeId());
+            dimensionInfoList.forEach(dimTable -> {
+                //创建维度执行日志
+                CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
+                dimExecLog.setCubeId(dimTable.getCubeId());
+                dimExecLog.setDimId(dimTable.getId());
+                dimExecLog.setJobId(dimTable.getJobId());
+                dimExecLog.setBusinessStartTime(startTime);
+                dimExecLog.setBusinessEndTime(endTime);
+                cubeDimensionExecLogMapper.save(dimExecLog);
+                ReturnT<String> result = xxlJobService.triggerJob(dimTable.getJobId());
+                if (result.getCode() == ReturnT.SUCCESS_CODE) {
+                    logger.info("触发成功");
+                }
+            });
+        }
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> clearCube(String cubeId) {
+
+        //获取立方信息
+        CubeInfo cubeInfo = cubeInfoMapper.loadByCubeId(cubeId);
+        if (cubeInfo == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("cube_info") + I18nUtil.getString("system_not_found")));
+        }
+        //获取维度列表
+        List<CubeDimensionInfo> dimTables = cubeDimensionInfoMapper.getDimensionInfoByCubeId(cubeId);
+        if (dimTables.isEmpty()) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("Cube_dimension_info") + I18nUtil.getString("system_not_found")));
+        }
+        dimTables.forEach(table -> {
+            Properties properties = new Properties();
+            properties.setProperty("url", table.getJdbcUrl());
+            properties.setProperty("user", table.getJdbcUsername());
+            properties.setProperty("password", table.getJdbcPassword());
+            properties.setProperty("driver", table.getJdbcDriver());
+            String deleteSql = "DELETE FROM " + table.getTableName();
+            int cnt = JdbcTemplateHelper.update(properties, deleteSql, new HashMap<>());
+            logger.debug(">>>>>>>>>>> clear table data, table:{}, data:{}", table.getTableName(), cnt);
+        });
 
         return ReturnT.SUCCESS;
     }

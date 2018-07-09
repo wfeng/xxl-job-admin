@@ -6,9 +6,10 @@ package com.xxl.job.admin.core.model;
 public class CubeSourceTable {
 
     private int id;                // 主键ID 自增
-    private int cubeId;                // 立方编号
+    private String cubeId;                // 立方编号
     private int primaryTable;                // 是否为主数据
     private String tableName;                // 表名
+    private String incrFieldName;        //增量字段
     private int parallelism;        // 并行度
     private String parallelismFieldName;   //并行分区字段名
     private int parallelismType;        // 并行分区类型
@@ -27,11 +28,11 @@ public class CubeSourceTable {
         this.id = id;
     }
 
-    public int getCubeId() {
+    public String getCubeId() {
         return cubeId;
     }
 
-    public void setCubeId(int cubeId) {
+    public void setCubeId(String cubeId) {
         this.cubeId = cubeId;
     }
 
@@ -49,6 +50,14 @@ public class CubeSourceTable {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getIncrFieldName() {
+        return incrFieldName;
+    }
+
+    public void setIncrFieldName(String incrFieldName) {
+        this.incrFieldName = incrFieldName;
     }
 
     public int getParallelism() {

@@ -6,10 +6,14 @@ package com.xxl.job.admin.core.model;
 public class CubeDimensionInfo {
 
     private int id;    //主键ID
-    private int cubeId;   // 立方编号
+    private String cubeId;   // 立方编号
     private String tableName;    //表名
     private String description;  //维度描述
-    private String executeSql;  //执行语句
+    private String selectSql; //select语句
+    private String whereSql; //where语句
+    private String groupbySql; //groupbySql语句
+    private String havingSql;  //havingSql语句
+
     private int saveMode;       //保存模式 1-Append/2-Overwrite/3-ErrorIfExists/4-Ignore
     private int jobId;          //任务Id
     private String jdbcUrl;      //数据库连接
@@ -26,11 +30,11 @@ public class CubeDimensionInfo {
         this.id = id;
     }
 
-    public int getCubeId() {
+    public String getCubeId() {
         return cubeId;
     }
 
-    public void setCubeId(int cubeId) {
+    public void setCubeId(String cubeId) {
         this.cubeId = cubeId;
     }
 
@@ -50,12 +54,36 @@ public class CubeDimensionInfo {
         this.description = description;
     }
 
-    public String getExecuteSql() {
-        return executeSql;
+    public String getSelectSql() {
+        return selectSql;
     }
 
-    public void setExecuteSql(String executeSql) {
-        this.executeSql = executeSql;
+    public void setSelectSql(String selectSql) {
+        this.selectSql = selectSql;
+    }
+
+    public String getWhereSql() {
+        return whereSql;
+    }
+
+    public void setWhereSql(String whereSql) {
+        this.whereSql = whereSql;
+    }
+
+    public String getGroupbySql() {
+        return groupbySql;
+    }
+
+    public void setGroupbySql(String groupbySql) {
+        this.groupbySql = groupbySql;
+    }
+
+    public String getHavingSql() {
+        return havingSql;
+    }
+
+    public void setHavingSql(String havingSql) {
+        this.havingSql = havingSql;
     }
 
     public int getSaveMode() {
