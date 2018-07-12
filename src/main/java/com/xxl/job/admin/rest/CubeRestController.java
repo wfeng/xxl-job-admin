@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 /**
+ * 立方相关Rest接口
  * Created by wfeng on 2018/6/6.
  */
 @RestController
 @RequestMapping("/api/cube")
-@Api(description = "任务管理接口")
+@Api(description = "立方相关Rest接口")
 public class CubeRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(CubeRestController.class);

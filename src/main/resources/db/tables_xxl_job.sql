@@ -234,32 +234,32 @@ CREATE TABLE `CUBE_SOURCE_TABLE` (
 
 CREATE TABLE `CUBE_DIMENSION_INFO` (
   ##基础信息
-  `id`             INT(11)       NOT NULL AUTO_INCREMENT,
-  `cube_id`        VARCHAR(50)   NOT NULL
+  `id`            INT(11)       NOT NULL AUTO_INCREMENT,
+  `cube_id`       VARCHAR(50)   NOT NULL
   COMMENT '立方编号',
-  `table_name`     VARCHAR(255)  NOT NULL
+  `table_name`    VARCHAR(255)  NOT NULL
   COMMENT '表名',
-  `description`    VARCHAR(255) COMMENT '维度描述',
-  `select_sql`     VARCHAR(5000) NOT NULL
+  `description`   VARCHAR(255) COMMENT '维度描述',
+  `select_sql`    VARCHAR(5000) NOT NULL
   COMMENT 'select语句',
-  `where_sql`      VARCHAR(5000) NOT NULL
+  `where_sql`     VARCHAR(5000) NULL
   COMMENT 'where语句',
-  `groupby_sql`    VARCHAR(5000) NOT NULL
+  `groupby_sql`   VARCHAR(5000) NULL
   COMMENT 'groupby语句',
-  `having_sql`     VARCHAR(5000) NULL
+  `having_sql`    VARCHAR(5000) NULL
   COMMENT 'having语句',
-  `save_mode`      INT(11)       NOT NULL
+  `save_mode`     INT(11)       NOT NULL
   COMMENT '保存模式 1-Append/2-Overwrite/3-ErrorIfExists/4-Ignore',
-  `job_id`         INT(11)       NOT NULL
+  `job_id`        INT(11)       NOT NULL
   COMMENT '任务Id',
   ##jdbc设置
-  `jdbc_url`       VARCHAR(255)  NOT NULL
+  `jdbc_url`      VARCHAR(255)  NOT NULL
   COMMENT '数据库连接',
-  `jdbc_username`  VARCHAR(255)  NOT NULL
+  `jdbc_username` VARCHAR(255)  NOT NULL
   COMMENT '访问账号',
-  `jdbc_password`  VARCHAR(255)  NOT NULL
+  `jdbc_password` VARCHAR(255)  NOT NULL
   COMMENT '访问密码',
-  `jdbc_driver`    VARCHAR(255)  NOT NULL
+  `jdbc_driver`   VARCHAR(255)  NOT NULL
   COMMENT 'jdbc驱动',
   `jdbc_batchsize` INT(11)       NOT NULL
   COMMENT '批量执行数量',
