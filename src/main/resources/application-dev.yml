@@ -1,5 +1,5 @@
 server:
-    port: 8182
+    port: 8181
 
 spring:
     application:
@@ -73,7 +73,7 @@ xxl:
         ### xxl-job login
         login:
             username: admin
-            password: 654321
+            password: 123456
         ### xxl-job, access token
         accessToken: ''
         ### xxl-job, i18n (default empty as chinese, "en" as english)
@@ -98,3 +98,4 @@ logging:
     level:
         root: info
         xxl.job.admin: debug
+    path: /Users/wfeng/efuture/workspaces/ews-all/engine-spark/logs

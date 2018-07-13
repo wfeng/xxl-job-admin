@@ -5,7 +5,6 @@ import com.xxl.job.admin.rest.vm.CreatCubeJobsRequestVM;
 import com.xxl.job.admin.rest.vm.DimensionTableAttribute;
 import com.xxl.job.admin.rest.vm.SourceTableAttribute;
 import com.xxl.job.admin.service.CubeService;
-import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,9 +25,6 @@ import javax.annotation.Resource;
 public class CubeRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(CubeRestController.class);
-
-    @Resource
-    private XxlJobService xxlJobService;
 
     @Resource
     private CubeService cubeService;
@@ -85,7 +81,7 @@ public class CubeRestController {
     }
 
     @ApiOperation(value = "清空立方任务", notes = "")
-    @PostMapping("/clearCubeJobs/{cubeId}")
+    @GetMapping("/clearCubeJobs/{cubeId}")
     public ReturnT<String> clearCubeJobs(@PathVariable String cubeId) {
         logger.info("清空数据立方接口");
         return cubeService.clearCube(cubeId);
