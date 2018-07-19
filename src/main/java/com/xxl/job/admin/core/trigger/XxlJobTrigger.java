@@ -15,6 +15,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -151,17 +152,21 @@ public class XxlJobTrigger {
             triggerMsgSb.append("<br>").append(I18nUtil.getString("jobinfo_field_executorFailStrategy")).append("：").append(failStrategy.getTitle());
 
 
-            // 4.1、save cube dim exec log table
-//            CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
-//            dimExecLog.setCubeId(dimension.getCubeId());
-//            dimExecLog.setDimId(dimension.getId());
-//            dimExecLog.setJobId(jobId);
-//            dimExecLog.setJobLogId(jobLog.getId());
-//            XxlJobDynamicScheduler.cubeDimensionExecLogMapper.save(dimExecLog);
-//            logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}", dimExecLog.getId());
+            //判断是否有维度执行日志，有则更新jobLogId(手动触发)，无则新增日志。(定时触发)
             CubeDimensionExecLog execLog = XxlJobDynamicScheduler.cubeDimensionExecLogMapper.getLastOneLogByJobId(jobId);
-            execLog.setJobLogId(jobLog.getId());
-            XxlJobDynamicScheduler.cubeDimensionExecLogMapper.update(execLog);
+            if (execLog != null && execLog.getJobLogId() == 0) {
+                execLog.setJobLogId(jobLog.getId());
+                XxlJobDynamicScheduler.cubeDimensionExecLogMapper.update(execLog);
+            } else {
+                execLog = new CubeDimensionExecLog();
+                execLog.setCubeId(dimension.getCubeId());
+                execLog.setDimId(dimension.getId());
+                execLog.setJobId(jobId);
+                execLog.setJobLogId(jobLog.getId());
+                execLog.setBusinessStartTime(LocalDate.now().minusDays(1)); //增量更新 前一天
+                execLog.setBusinessEndTime(LocalDate.now().minusDays(1)); //增量更新 前一天
+                XxlJobDynamicScheduler.cubeDimensionExecLogMapper.save(execLog);
+            }
             logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}, jobLogId:{}", execLog.getId(), jobLog.getId());
 
             // 3、trigger-valid
@@ -172,17 +177,7 @@ public class XxlJobTrigger {
 
             if (triggerResult.getCode() == ReturnT.SUCCESS_CODE) {
 
-//                // 4.1、save cube dim exec log table
-//                CubeDimensionExecLog dimExecLog = new CubeDimensionExecLog();
-//                dimExecLog.setCubeId(dimension.getCubeId());
-//                dimExecLog.setDimId(dimension.getId());
-//                dimExecLog.setJobId(jobId);
-//                dimExecLog.setJobLogId(jobLog.getId());
-//                XxlJobDynamicScheduler.cubeDimensionExecLogMapper.save(dimExecLog);
-//                logger.debug(">>>>>>>>>>> xxl-job trigger start, dimExecLogId:{}", dimExecLog.getId());
-
-
-                // 4.2、trigger-param
+                // 4.1、trigger-param
                 TriggerParam triggerParam = new TriggerParam();
                 triggerParam.setJobId(jobInfo.getId());
                 triggerParam.setExecutorHandler(jobInfo.getExecutorHandler());
@@ -196,11 +191,11 @@ public class XxlJobTrigger {
                 triggerParam.setBroadcastIndex(0);
                 triggerParam.setBroadcastTotal(1);
 
-                // 4.3、trigger-run (route run / trigger remote executor)
+                // 4.2、trigger-run (route run / trigger remote executor)
                 triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                 triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());
 
-                // 4.4、trigger (fail retry)
+                // 4.3、trigger (fail retry)
                 if (triggerResult.getCode() != ReturnT.SUCCESS_CODE && failStrategy == ExecutorFailStrategyEnum.FAIL_RETRY) {
                     triggerResult = executorRouteStrategyEnum.getRouter().routeRun(triggerParam, addressList);
                     triggerMsgSb.append("<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_fail_retry") + "<<<<<<<<<<< </span><br>").append(triggerResult.getMsg());

@@ -115,8 +115,8 @@ public class DimensionTableAttribute {
         return jdbcAttr.isEmpty()
                 || StringUtils.isBlank(tableName)
                 || StringUtils.isBlank(selectSql)
-                || StringUtils.isBlank(whereSql)
-                || StringUtils.isBlank(groupbySql)
+//                || StringUtils.isBlank(whereSql) //不一定有，不校验此项
+//                || StringUtils.isBlank(groupbySql) //不一定有，不校验此项
                 || StringUtils.isBlank(description);
     }
 }

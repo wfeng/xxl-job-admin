@@ -1,5 +1,6 @@
 package com.xxl.job.admin.rest;
 
+import com.alibaba.fastjson.JSONObject;
 import com.xxl.job.admin.rest.vm.BuildCubeJobsRequestVM;
 import com.xxl.job.admin.rest.vm.CreatCubeJobsRequestVM;
 import com.xxl.job.admin.rest.vm.DimensionTableAttribute;
@@ -32,7 +33,7 @@ public class CubeRestController {
     @ApiOperation(value = "创建立方任务", notes = "")
     @PostMapping("/creatCubeJobs")
     public ReturnT<String> creatCubeJobs(@RequestBody CreatCubeJobsRequestVM requestVM) {
-        logger.info("创建数据立方接口");
+        logger.info("调用创建数据立方接口,参数:" + JSONObject.toJSONString(requestVM));
 
         //验证输入项
         if (StringUtils.isBlank(requestVM.getCudeId())) {
@@ -76,14 +77,14 @@ public class CubeRestController {
     @ApiOperation(value = "构建立方任务", notes = "")
     @PostMapping("/buildCubeJobs")
     public ReturnT<String> buildCubeJobs(@RequestBody BuildCubeJobsRequestVM requestVM) {
-        logger.info("构建数据立方接口");
+        logger.info("调用构建数据立方接口,参数:" + JSONObject.toJSONString(requestVM));
         return cubeService.buildCube(requestVM);
     }
 
     @ApiOperation(value = "清空立方任务", notes = "")
     @GetMapping("/clearCubeJobs/{cubeId}")
     public ReturnT<String> clearCubeJobs(@PathVariable String cubeId) {
-        logger.info("清空数据立方接口");
+        logger.info("调用清空数据立方接口,参数:" + cubeId);
         return cubeService.clearCube(cubeId);
     }
 
@@ -91,15 +92,13 @@ public class CubeRestController {
     @PostMapping("/refreshCubeJobs")
     public ReturnT<String> refreshCubeJobs(@RequestBody BuildCubeJobsRequestVM requestVM) {
         logger.info("刷新数据立方接口");
-
         return ReturnT.SUCCESS;
     }
 
     @ApiOperation(value = "销毁立方任务", notes = "")
     @GetMapping("/destroyCubeJobs/{cubeId}")
     public ReturnT<String> destroyCubeJobs(@PathVariable String cubeId) {
-        logger.info("销毁数据立方接口");
-        logger.info("销毁数据立方编号:" + cubeId);
+        logger.info("调用销毁数据立方接口,参数:" + cubeId);
         return cubeService.destroyCube(cubeId);
     }
 
