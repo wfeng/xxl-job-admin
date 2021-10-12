@@ -33,7 +33,7 @@
 
         <groovy-all.version>2.4.13</groovy-all.version>
         <quartz.version>2.3.2</quartz.version>
-        <xxl-job-admin.version>1.9.1</xxl-job-admin.version>
+        <xxl-job-admin.version>2.3.0</xxl-job-admin.version>
 
         <pagehelper.version>4.1.1</pagehelper.version>
         <mapper.version>3.4.0</mapper.version>
