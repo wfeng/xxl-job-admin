@@ -39,7 +39,7 @@
         <mapper.version>3.4.0</mapper.version>
         <druid.version>1.0.29</druid.version>
 
-        <fastjson.version>1.2.31</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
     </properties>
 
     <dependencies>
