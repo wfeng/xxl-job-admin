@@ -35,7 +35,7 @@
         <quartz.version>2.3.2</quartz.version>
         <xxl-job-admin.version>1.9.1</xxl-job-admin.version>
 
-        <pagehelper.version>4.1.1</pagehelper.version>
+        <pagehelper.version>5.3.1</pagehelper.version>
         <mapper.version>3.4.0</mapper.version>
         <druid.version>1.0.29</druid.version>
 
